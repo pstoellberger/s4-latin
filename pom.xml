@@ -1,0 +1,142 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>io.s4</groupId>
+	<artifactId>s4-latin</artifactId>
+	<packaging>jar</packaging>
+	<name>s4-latin</name>
+	<version>1.0-SNAPSHOT</version>
+	<properties>
+		<maven.compiler.source>1.5</maven.compiler.source>
+		<maven.compiler.target>1.5</maven.compiler.target>
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>commons-httpclient</groupId>
+									<artifactId>commons-httpclient</artifactId>
+									<version>3.1</version>
+									<type>jar</type>
+									<outputDirectory>target/dist/lib</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>commons-codec</groupId>
+									<artifactId>commons-codec</artifactId>
+									<version>1.3</version>
+									<type>jar</type>
+									<outputDirectory>target/dist/lib</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<id>copy-package</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<copy
+									file="${basedir}/target/${project.artifactId}-${project.version}.jar"
+									todir="target/dist/lib" />
+								<copy todir="target/dist/" overwrite="true">
+									<fileset dir="${basedir}/src/main/resources/">
+										<include name="*.xml" />
+									</fileset>
+								</copy>
+								<zip destfile="target/${project.artifactId}-${project.version}.zip">
+									<zipfileset dir="target/dist/" />
+								</zip>
+
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+
+			</plugin>
+
+
+		</plugins>
+
+	</build>
+	<repositories>
+		<repository>
+			<id>ibiblio</id>
+			<url>http://ibiblio.org/maven2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>java</id>
+			<url>http://download.java.net/maven/2/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<!-- <repository> <id>central-sync</id> <name>Central Sync Sources</name> 
+			<url>https://oss.sonatype.org/content/repositories/central-sync</url> </repository> -->
+		<repository>
+			<id>apache</id>
+			<name>apache</name>
+			<url>http://ftp.cica.es/mirrors/maven2/</url>
+		</repository>
+	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>io.s4</groupId>
+			<artifactId>s4-core</artifactId>
+			<version>0.3-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.jms</groupId>
+					<artifactId>jms</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jmx</groupId>
+			<artifactId>jmxri</artifactId>
+			<version>1.2.1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/../s4/lib/kryo-1.01.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.3</version>
+		</dependency>
+
+
+	</dependencies>
+</project>
