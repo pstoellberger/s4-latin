@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -99,12 +100,9 @@ public class TwitterFeedListener implements ISource, EventProducer, Runnable {
     public void run() {
         long backoffTime = 1000;
         while (!Thread.interrupted()) {
-            System.out.println("RUN FOREST, RUN!");
 
             try {
                 connectAndRead();
-                System.out.println("CONNECT FOREST, CONNECT!");
-
             } catch (Exception e) {
             	e.printStackTrace();
                 Logger.getLogger("s4").error("Exception reading feed", e);
@@ -128,15 +126,15 @@ public class TwitterFeedListener implements ISource, EventProducer, Runnable {
         connection.setReadTimeout(10000);
 
         String userPassword = userid + ":" + password;
-        System.out.println("connect? : " + connection.getURL().toString());
+        System.out.println("connect to " + connection.getURL().toString() + " ...");
 
         String encoded = EncodingUtil.getAsciiString(Base64.encodeBase64(EncodingUtil.getAsciiBytes(userPassword)));
         connection.setRequestProperty("Authorization", "Basic " + encoded);
 
         connection.connect();
-        System.out.println("ok connect");
-        System.out.flush();
-
+        System.out.println("Connect OK!");
+        System.out.println("Reading TwitterFeed ....");
+        Long startTime = new Date().getTime();
         InputStream is = connection.getInputStream();
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
@@ -150,6 +148,10 @@ public class TwitterFeedListener implements ISource, EventProducer, Runnable {
             }
             messageCount++;
             messageQueue.add(inputLine);
+            if (messageCount % 500 == 0) {
+            	Long currentTime = new Date().getTime();
+            	System.out.println("Lines processed: " + messageCount + "\t ( " + blankCount + " empty lines ) in " + (currentTime-startTime)/1000 + " seconds. Reading "+ messageCount / ((currentTime-startTime)/1000) + " rows/second");
+            }
         }
     }
 
@@ -206,13 +208,11 @@ public class TwitterFeedListener implements ISource, EventProducer, Runnable {
                 Object value = jsonObject.opt("id");
                 if (value != null && !value.equals(JSONObject.NULL)) {
                     status.set("id", ((Number) value), ValueType.NUMBER);
-//                	status.set("id", ((String) value), ValueType.STRING);
                 }
 
                 value = jsonObject.opt("in_reply_to_status_id");
                 if (value != null && !value.equals(JSONObject.NULL)) {
                 	status.set("in_reply_to_status_id", ((Number) value), ValueType.NUMBER);
-//                	status.set("in_reply_to_status_id", ((String) value), ValueType.STRING);
 
                 }
 
@@ -223,7 +223,6 @@ public class TwitterFeedListener implements ISource, EventProducer, Runnable {
 
                 value = jsonObject.opt("truncated");
                 if (value != null && !value.equals(JSONObject.NULL)) {
-//                    status.set("truncated", ((Boolean) value), ValueType.BOOLEAN);
                 	status.set("truncated", ((Boolean) value).toString(), ValueType.STRING);
 
                 }
@@ -240,16 +239,12 @@ public class TwitterFeedListener implements ISource, EventProducer, Runnable {
 
                 value = jsonObject.opt("favorited");
                 if (value != null && !value.equals(JSONObject.NULL)) {
-//                    status.set("favorited", ((Boolean) value), ValueType.BOOLEAN);
                 	status.set("favorited", ((Boolean) value).toString(), ValueType.STRING);
-
                 }
 
                 value = jsonObject.opt("in_reply_to_user_id");
                 if (value != null && !value.equals(JSONObject.NULL)) {
                 	status.set("in_reply_to_user_id", ((Number) value), ValueType.NUMBER);
-//                	status.set("in_reply_to_user_id", ((String) value), ValueType.STRING);
-
                 }
 
                 value = jsonObject.opt("created_at");

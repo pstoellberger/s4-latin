@@ -1,5 +1,6 @@
 package io.s4.latin.pojo;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,10 @@ public class StreamRow {
 	
 	public Object get(String key) {
 		return row.get(key);
+	}
+	
+	public Collection<Object> getValues() {
+		return row.values();
 	}
 	
 	public void remove(String key) {

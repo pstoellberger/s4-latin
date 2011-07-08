@@ -17,7 +17,6 @@ import org.springframework.core.io.Resource;
 
 public class Module implements ApplicationContextAware {
 
-	private String name;
 	private ApplicationContext ctx;
 	private List<String> latinFileLocation;
 	private boolean processAdapters = false;
