@@ -119,7 +119,6 @@ public class TopNResourcesPE extends AbstractPE {
 				System.out.print(tne.getResource() + "\t" + Math.floor(tne.getSum()) + " MB\t");
 			}
 			message.put("topN", jsonTopN);
-//			System.out.println("####### PERSIST:" + message.toString());
 			persister.set(persistKey, message.toString()+"\n\n", persistTime);
 		} catch (Exception e) {
 			Logger.getLogger("s4").error(e);

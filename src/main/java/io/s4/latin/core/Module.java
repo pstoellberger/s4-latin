@@ -21,7 +21,7 @@ public class Module implements ApplicationContextAware {
 	private List<String> latinFileLocation;
 	private boolean processAdapters = false;
 	private boolean processPEs = false;
-	
+
 	public void setProcessPEs(boolean processPEs) {
 		this.processPEs = processPEs;
 	}
@@ -38,24 +38,24 @@ public class Module implements ApplicationContextAware {
 	public void setLatinFile(List<String> file) {
 		this.latinFileLocation = file;
 	}
-	
-	
+
+
 
 	public void init() {
 
 		try {
-			
-		if (latinFileLocation == null)
-			throw new RuntimeException("LatinFile location cannot be null");
 
-		for (String location : latinFileLocation) {
-			Resource lfResource =  ctx.getResource(location);
-			if (lfResource == null)
-				throw new RuntimeException("LatinFile resource cannot be null");
+			if (latinFileLocation == null)
+				throw new RuntimeException("LatinFile location cannot be null");
+
+			for (String location : latinFileLocation) {
+				Resource lfResource =  ctx.getResource(location);
+				if (lfResource == null)
+					throw new RuntimeException("LatinFile resource cannot be null");
 
 
 				File latinFile = lfResource.getFile();
-				
+
 				FileReader fi = new FileReader(latinFile);
 				BufferedReader br = new BufferedReader(fi);
 				String chunk ="",filecontent ="";
@@ -70,28 +70,23 @@ public class Module implements ApplicationContextAware {
 						((FileSystemXmlApplicationContext) ctx).getBeanFactory().registerSingleton(bn,moduleBeans.getBean(bn));
 						System.out.println("Registering bean: " + bn);
 					}
-//					moduleBeans.destroySingletons();
-//					moduleBeans = null;
 				}
-	            if (processAdapters) {
-	        		System.out.println("Parse adapters");
-	            	DefaultListableBeanFactory adapterBeans = S4LatinBeansFactory.createAdapters(ctx, filecontent);
+				if (processAdapters) {
+					System.out.println("Parse adapters");
+					DefaultListableBeanFactory adapterBeans = S4LatinBeansFactory.createAdapters(ctx, filecontent);
 					System.out.println("######## ADAPTERS LOADED");
-		            for (String bn : adapterBeans.getBeanDefinitionNames()) {
-			            ((FileSystemXmlApplicationContext) ctx).getBeanFactory().registerSingleton(bn,adapterBeans.getBean(bn));
-			            System.out.println("Registering bean: " + bn);
-		            }
-		            Map listenerBeanMap = ((FileSystemXmlApplicationContext) ctx).getBeansOfType(EventProducer.class);
-		            System.out.println("Bean size:" + listenerBeanMap.size());
-//		            adapterBeans.destroySingletons();
-//		            adapterBeans = null;
-	            	
-	            }
-	            
-		}
+					for (String bn : adapterBeans.getBeanDefinitionNames()) {
+						((FileSystemXmlApplicationContext) ctx).getBeanFactory().registerSingleton(bn,adapterBeans.getBean(bn));
+						System.out.println("Registering bean: " + bn);
+					}
+					Map listenerBeanMap = ((FileSystemXmlApplicationContext) ctx).getBeansOfType(EventProducer.class);
+					System.out.println("Bean size:" + listenerBeanMap.size());
+				}
+
+			}
 
 		}
-		
+
 		catch (Exception e) {
 			e.printStackTrace(System.err);
 		}

@@ -18,7 +18,7 @@ public class LatinPersisterPE extends AbstractPE {
 	private String id;
 	private String statement;
 	private Persister persister;
-	private int persistTime;
+	private int cacheTime = 120;
 	private String persistKey = "persister:Latin";
 
 	private boolean debug = false;
@@ -82,7 +82,7 @@ public class LatinPersisterPE extends AbstractPE {
 		List<StreamRow> outputCache = cache;
 		cache = new ArrayList<StreamRow>();
 		try {
-			persister.set(persistKey, outputCache, persistTime);
+			persister.set(persistKey, outputCache, cacheTime);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Logger.getLogger("s4").error(e);

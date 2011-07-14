@@ -65,15 +65,6 @@ public class AccessLogParserPE extends AbstractPE {
         sr.set("browser", matcher.group(9), ValueType.STRING);
         sr.setKey("resource");
         
-//        AccesslogRow ar = new AccesslogRow(
-//        		matcher.group(1),
-//        		matcher.group(4), 
-//        		matcher.group(5), 
-//        		matcher.group(6), 
-//        		matcher.group(7), 
-//        		"-".equals(matcher.group(8)) ? null : matcher.group(8),
-//        		matcher.group(9));
-//        System.out.println("AccesslogRow : " + sr.get("resource"));
         dispatcher.dispatchEvent(outputStreamName, sr);
     }
 
