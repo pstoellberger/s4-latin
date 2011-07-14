@@ -1,7 +1,7 @@
 package io.s4.latin.parser;
 
 import io.s4.dispatcher.partitioner.Partitioner;
-import io.s4.latin.adapter.Source;
+import io.s4.processor.AbstractPE.FrequencyType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,25 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 public class LatinParser {
 
 	public LatinParser() {};
-	
+
+	public DefaultListableBeanFactory processPersistDefinitions(String streamLatin, DefaultListableBeanFactory bf) {
+		streamLatin = preProcess(streamLatin);
+		String[] statements = streamLatin.split("\n");
+
+		int index = 0;
+		for (String statement : statements) {
+			index++;
+			if (statement.toLowerCase().startsWith("persist stream")) {
+				String id = "Persister_" + index;
+				BeanDefinitionBuilder persistBuilder = BeanDefinitionBuilder.rootBeanDefinition("io.s4.latin.persister.LatinPersisterPE");
+				persistBuilder.setScope(BeanDefinition.SCOPE_SINGLETON);
+				persistBuilder.addPropertyValue("id", id);
+				persistBuilder.addPropertyValue("statement", statement);
+				bf.registerBeanDefinition(id, persistBuilder.getBeanDefinition());
+			}
+		}
+		return bf;
+	}
 	public DefaultListableBeanFactory processStreamdefinitions(String streamLatin, DefaultListableBeanFactory bf) {
 		streamLatin = preProcess(streamLatin);
 		String[] statements = streamLatin.split("\n");
@@ -27,7 +45,7 @@ public class LatinParser {
 				BeanDefinitionBuilder sourceBuilder = BeanDefinitionBuilder.rootBeanDefinition("io.s4.latin.adapter.Source");
 				sourceBuilder.setScope(BeanDefinition.SCOPE_SINGLETON);
 				sourceBuilder.addConstructorArgValue(getSourceClassName(statement));
-				sourceBuilder.addConstructorArgValue(getProperties(statement)+"\nstream=" + getOutputStreamName(statement));
+				sourceBuilder.addConstructorArgValue(getProperties(getSourceClassName(statement),statement)+"\nstream=" + getOutputStreamName(statement));
 				sourceBuilder.setInitMethodName("init");
 				bf.registerBeanDefinition(id, sourceBuilder.getBeanDefinition());
 
@@ -35,7 +53,7 @@ public class LatinParser {
 		}
 		return bf;
 	}
-	public DefaultListableBeanFactory process(String queryLatin, DefaultListableBeanFactory bf) {
+	public DefaultListableBeanFactory processQueryDefinitions(String queryLatin, DefaultListableBeanFactory bf) {
 		queryLatin = preProcess(queryLatin);
 		String[] statements = queryLatin.split("\n");
 
@@ -43,8 +61,8 @@ public class LatinParser {
 		for (String statement : statements) {
 			index++;
 			String id = getStreamName(statement) + "_" + index;
-			if (!statement.toLowerCase().contains("create stream") && !statement.startsWith("store ")) {
-				
+			if (!statement.toLowerCase().contains("create stream") && !statement.startsWith("persist stream ")) {
+
 				// Partitioner Bean definition
 				BeanDefinitionBuilder buildPartitioner = BeanDefinitionBuilder.rootBeanDefinition("io.s4.dispatcher.partitioner.DefaultPartitioner");
 				buildPartitioner.setScope(BeanDefinition.SCOPE_SINGLETON);
@@ -68,9 +86,9 @@ public class LatinParser {
 				List<Partitioner> beanlist = new ArrayList<Partitioner>();
 				beanlist.add((Partitioner)pBean);
 				beanBuildr2.addPropertyValue("partitioners", beanlist);
-	
+
 				// Processing Bean definition
-				
+
 				BeanDefinitionBuilder beanBuildr = BeanDefinitionBuilder.rootBeanDefinition("io.s4.latin.core.GenericLatinPE");
 				beanBuildr.setScope(BeanDefinition.SCOPE_SINGLETON);
 				beanBuildr.addPropertyValue("outputStreamName", getStreamName(statement));
@@ -125,6 +143,19 @@ public class LatinParser {
 		}
 		return null;
 	}
+	
+	public static String getPersistFrom(String statement) {
+		if (statement != null) {
+			String statement2 = statement.toLowerCase();
+			int iPersist = statement2.indexOf("persist stream");
+			int iTo = statement2.indexOf(" to ", iPersist);
+			if (iPersist >= 0) {
+				int end = iTo > 0 ? iTo : statement.length();
+				return statement.substring(iPersist+"persist stream".length(),end);
+			}
+		}
+		return null;
+	}
 
 	public static String getWhere(String statement) {
 		if (statement != null) {
@@ -145,7 +176,7 @@ public class LatinParser {
 		}
 		return null;
 	}
-	
+
 	public static String getOutputStreamName(String statement) {
 		if (statement != null) {
 			String[] tokens = statement.split(" ");
@@ -155,7 +186,7 @@ public class LatinParser {
 		}
 		return null;
 	}
-	
+
 	public static String getSourceClassName(String statement) {
 		if (statement != null) {
 			int start = statement.indexOf("Source(");
@@ -166,20 +197,72 @@ public class LatinParser {
 		}
 		throw new RuntimeException("Cannot parse statement for source class name: " + statement);
 	}
-	
-	public static String getProperties(String statement) {
+
+	public static String getOutputClassName(String statement) {
 		if (statement != null) {
-			int start = statement.indexOf(getSourceClassName(statement));
+			int start = statement.toLowerCase().indexOf("output(");
+			int end = statement.indexOf(",",start);
+			if (start >= 0 && end >= 0) {
+				return statement.substring(start+"output(".length(), end);
+			}
+		}
+		throw new RuntimeException("Cannot parse statement for output class name: " + statement);
+	}
+
+	public static FrequencyType getOutputType(String statement) {
+		if (statement != null && !statement.trim().endsWith(")")) {
+			int tstart = statement.toLowerCase().indexOf("output(");
+			int tend = statement.indexOf(")",tstart);
+			if (tstart >= 0 && tend >= 0) {
+				String interval =  statement.substring(tend, statement.length());
+				String[] tokens = interval.split(" ");
+				if (tokens.length == 3 && tokens[0].equals("every")) {
+					if (tokens[3].equals("seconds")) {
+						return FrequencyType.TIMEBOUNDARY;
+					}
+					else if (tokens[3].equals("events")) {
+						return FrequencyType.EVENTCOUNT;
+					}
+					else {
+						throw new RuntimeException("Cannot parse output type: " + tokens[3]);
+					}
+				}
+			}
+
+		}
+		return null;
+	}
+
+	public static Integer getOutputFrequency(String statement) {
+		if (statement != null && !statement.trim().endsWith(")")) {
+			int tstart = statement.toLowerCase().indexOf("output(");
+			int tend = statement.indexOf(")",tstart);
+			if (tstart >= 0 && tend >= 0) {
+				String interval =  statement.substring(tend, statement.length());
+				String[] tokens = interval.split(" ");
+				if (tokens.length == 3 && tokens[0].equals("every")) {
+					Integer frequency = Integer.parseInt(tokens[2]);
+					return frequency;
+				}
+			}
+
+		}
+		throw new RuntimeException("Cannot parse statement for output frequency: " + statement);
+	}
+
+	public static String getProperties(String className, String statement) {
+		if (statement != null) {
+			int start = statement.indexOf(className);
 			int end = statement.indexOf(")",start);
 			if (start >= 0 && end >= 0) {
-				String props = statement.substring(start+getSourceClassName(statement).length()+1, end);
+				String props = statement.substring(start+className.length()+1, end);
 				props = props.replaceAll(";", "\n");
 				return props;
 			}
 		}
 		throw new RuntimeException("Cannot parse statement for properties: " + statement);
 	}
-	
+
 
 
 }

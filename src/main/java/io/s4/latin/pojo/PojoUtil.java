@@ -45,6 +45,7 @@ public class PojoUtil {
 			line += value;
 			first = false;
 		}
+		line += "\n";
 		return line;
 		
 	}

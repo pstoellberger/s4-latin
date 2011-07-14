@@ -1,18 +1,3 @@
-/*
- * Copyright (c) 2010 Yahoo! Inc. All rights reserved.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 	        http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
- * either express or implied. See the License for the specific
- * language governing permissions and limitations under the
- * License. See accompanying LICENSE file. 
- */
 package io.s4.latin.persister;
 
 import io.s4.latin.pojo.PojoUtil;
@@ -24,24 +9,43 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
-public class DirectToFilePersister implements Persister {
+public class FilePersister implements Persister {
 
 	private String outputFilename;
-	private int persistCount;
+	private int persistCount = 0;
 	private boolean first = true;
+	private String delimiter = "\t";
+
 	private enum OutputType {
 		CSV,
 		JSON
 	}
 
-	private String delimiter = "\t";
-
 	private OutputType outputType = OutputType.CSV;
+
+	public FilePersister() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public FilePersister(Properties props) {
+		if (props != null) {
+			if (props.getProperty("type") != null) {
+				setOutputType(props.getProperty("type"));
+			}
+			if (props.getProperty("file") != null) {
+				outputFilename = props.getProperty("file");
+			}
+			if (props.getProperty("delimiter") != null) {
+				delimiter = props.getProperty("delimiter");
+			}
+		}
+	}
 
 	public void setOutputFilename(String outputFilename) {
 		this.outputFilename = outputFilename;
@@ -60,7 +64,7 @@ public class DirectToFilePersister implements Persister {
 					+ " Possible values are: " + values);
 		}
 	}
-	
+
 	public void setDelimiter(String delimiter) {
 		this.outputType = OutputType.CSV;
 		this.delimiter = delimiter;
@@ -142,14 +146,13 @@ public class DirectToFilePersister implements Persister {
 
 			@SuppressWarnings("unchecked")
 			List<StreamRow> rows = (List<StreamRow>) value;
-			fw = new FileWriter(outputFilename);
-
+			fw = new FileWriter(outputFilename,true);
 
 			for (StreamRow row : rows) {
 
 				if (outputType.equals(OutputType.JSON)) {
 					JSONObject output = PojoUtil.toJson(row);
-					fw.append(output.toString());
+					fw.append(output.toString() + "\n");
 
 				} else if (outputType.equals(OutputType.CSV)) {
 
@@ -160,9 +163,9 @@ public class DirectToFilePersister implements Persister {
 					fw.append(PojoUtil.toCsv(row.getValues(), delimiter));
 				}
 				persistCount++;
-	            if (persistCount % 500 == 0) {
-	            	System.out.println("Lines persisted: " + persistCount );
-	            }
+				if (persistCount % 500 == 0) {
+					System.out.println("Lines persisted: " + persistCount );
+				}
 
 			}
 

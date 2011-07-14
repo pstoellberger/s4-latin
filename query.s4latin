@@ -1,3 +1,4 @@
 create stream Twitter as Source(io.s4.latin.adapter.TwitterFeedListener,user=pstoellberger;password=twitter!p8;url=http://stream.twitter.com:80/1/statuses/sample.json)
 Filter = select id,text from Twitter where "truncated" = 'true' and "source" = 'web'
+persist stream Filter to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/fileoutput;) every 20 seconds
 

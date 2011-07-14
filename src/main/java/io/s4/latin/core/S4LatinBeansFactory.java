@@ -10,7 +10,8 @@ public class S4LatinBeansFactory {
 	public static DefaultListableBeanFactory createPEs(ApplicationContext parent, String filecontent) {
 		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(parent);
 		LatinParser lp = new LatinParser();
-		beanFactory = lp.process(filecontent,beanFactory);
+		beanFactory = lp.processQueryDefinitions(filecontent,beanFactory);
+		beanFactory = lp.processPersistDefinitions(filecontent, beanFactory);
 		return beanFactory;
 	}
 
