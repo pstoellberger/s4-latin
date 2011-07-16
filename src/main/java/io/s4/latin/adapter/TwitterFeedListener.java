@@ -175,7 +175,6 @@ public class TwitterFeedListener implements ISource, EventProducer, Runnable {
 
                     StreamRow row = getStatus(jsonObject);
                     EventWrapper ew = new EventWrapper(streamName, row, null);
-                    
                     for (io.s4.listener.EventHandler handler : handlers) {
                         try {
                             handler.processEvent(ew);

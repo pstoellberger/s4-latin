@@ -36,6 +36,20 @@ public class LatinPersisterPE extends AbstractPE {
 
 	public void processStatement() {
 		if (statement != null && statement.length() > 0) {
+			String from = LatinParser.getPersistFrom(statement);
+			
+			System.out.println("FROM :::::::::::::::::" + from);
+			if (from != null) {
+				from = from.trim();
+
+				if(from.startsWith("debug")) {
+					this.debug = true;
+					System.out.println("############### DEBUG IS SO : " + from.trim().startsWith("debug"));
+				}
+			}
+			else {
+				throw new RuntimeException("You have to define an Input Stream Name for this Persister\n Source: " + this);
+			}
 			String className = LatinParser.getOutputClassName(statement);
 			Object o = ObjectUtil.construct(className, LatinParser.getProperties(className, statement));
 
@@ -46,21 +60,22 @@ public class LatinPersisterPE extends AbstractPE {
 				throw new RuntimeException("Created object is not of type Persister - Class: " + className);
 			}
 
-			FrequencyType ft = LatinParser.getOutputType(statement);
-			if (ft != null) {
-				Integer freq = LatinParser.getOutputFrequency(statement);
-				switch (ft) {
-				case EVENTCOUNT:
-					setOutputFrequencyByEventCount(freq);
-					break;
-				case TIMEBOUNDARY:
-					setOutputFrequencyByTimeBoundary(freq);
-					break;
-				}
-			}
+			// TODO enable this as i know how to handle the .output() of AbstractPE and Persister methods
+//			FrequencyType ft = LatinParser.getOutputType(statement);
+//			if (ft != null) {
+//				Integer freq = LatinParser.getOutputFrequency(statement);
+//				switch (ft) {
+//				case EVENTCOUNT:
+//					setOutputFrequencyByEventCount(freq);
+//					break;
+//				case TIMEBOUNDARY:
+//					setOutputFrequencyByTimeBoundary(freq);
+//					break;
+//				}
+//			}
 
 			List<String> keys = new ArrayList<String>();
-			keys.add(LatinParser.getPersistFrom(statement) + " *");
+			keys.add(from+ " *");
 			setKeys(keys.toArray(new String[1]));
 		}
 	}
