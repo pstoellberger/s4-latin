@@ -114,20 +114,20 @@ persist stream bigrows to Output(io.s4.latin.persister.FilePersister,type=JSON;f
 
 In combination with PEs defined in the s4-latin-conf.xml
 <pre>
-'''
- <bean id="accesslogParserPE" class="io.s4.examples.logstats.pe.AccessLogParserPE">
-    <property name="id" value="accesslogPE"/>
-    <property name="keys">
-      <list>
-        <value>RawLog *</value>
-      </list>
-    </property>
-    <property name="columnName" value="line"/>
-    <property name="dispatcher" ref="resourceDispatcher"/>
-    <property name="outputStreamName" value="AccesslogRow"/>
-  </bean>
+    
+    <bean id="accesslogParserPE" class="io.s4.examples.logstats.pe.AccessLogParserPE">
+      <property name="id" value="accesslogPE"/>
+      <property name="keys">
+        <list>
+          <value>RawLog *</value>
+        </list>
+      </property>
+      <property name="columnName" value="line"/>
+      <property name="dispatcher" ref="resourceDispatcher"/>
+      <property name="outputStreamName" value="AccesslogRow"/>
+    </bean>
   
-  <bean id="resourceSeenPartitioner" class="io.s4.dispatcher.partitioner.DefaultPartitioner">
+    <bean id="resourceSeenPartitioner" class="io.s4.dispatcher.partitioner.DefaultPartitioner">
     <property name="streamNames">
       <list>
         <value>AccesslogRow</value>
@@ -140,9 +140,9 @@ In combination with PEs defined in the s4-latin-conf.xml
     </property>
     <property name="hasher" ref="hasher"/>
     <property name="debug" value="false"/>
-  </bean>
+    </bean>
 
-  <bean id="resourceDispatcher" class="io.s4.dispatcher.Dispatcher" init-method="init">
+    <bean id="resourceDispatcher" class="io.s4.dispatcher.Dispatcher" init-method="init">
     <property name="partitioners">
       <list>
         <ref bean="resourceSeenPartitioner"/>
@@ -150,7 +150,7 @@ In combination with PEs defined in the s4-latin-conf.xml
     </property>
     <property name="eventEmitter" ref="commLayerEmitter"/>
     <property name="loggerName" value="s4"/>
-  </bean>
+    </bean>
   
   
     <bean id="latinModule" class="io.s4.latin.core.Module" init-method="init">
@@ -160,8 +160,8 @@ In combination with PEs defined in the s4-latin-conf.xml
       </list>
     </property>
     <property name="processPEs" value="true"/>
-  </bean>
-'''  
+    </bean>
+    
 </pre>
 
 
