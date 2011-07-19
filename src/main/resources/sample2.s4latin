@@ -1,3 +1,5 @@
-create stream input as Source(io.s4.latin.adapter.TwitterFeedListener,user=zzzzz;password=xxx;url=http://stream.twitter.com:80/1/statuses/sample.json)
-debugTwitter = select id,created_at,text from input where "truncated" = 'true'
-persist stream debugTwitter to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/truncated_twitter_data;delimiter=\t\t)
+// make sure you replace xxxx with your username and password
+create stream input as Source(io.s4.latin.adapter.TwitterFeedListener,user=xxxx;password=xxxx;url=http://stream.twitter.com:80/1/statuses/sample.json)
+
+Twitter = select id,created_at,text from input where "truncated" = 'true'
+persist stream Twitter to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/truncated_twitter_data;delimiter=\t\t)
