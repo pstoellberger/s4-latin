@@ -38,13 +38,10 @@ public class LatinPersisterPE extends AbstractPE {
 		if (statement != null && statement.length() > 0) {
 			String from = LatinParser.getPersistFrom(statement);
 			
-			System.out.println("FROM :::::::::::::::::" + from);
 			if (from != null) {
 				from = from.trim();
-
-				if(from.startsWith("debug")) {
+				if (from.startsWith("debug")) {
 					this.debug = true;
-					System.out.println("############### DEBUG IS SO : " + from.trim().startsWith("debug"));
 				}
 			}
 			else {

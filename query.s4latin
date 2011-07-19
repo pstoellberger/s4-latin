@@ -1,4 +1,0 @@
-create stream input as Source(io.s4.latin.adapter.VfsFileReader,file=/tmp/input)
-//create stream input as Source(io.s4.latin.adapter.TwitterFeedListener,user=xxxx;password=zzzz;url=http://stream.twitter.com:80/1/statuses/sample.json)
-debugTest = select * from input
-persist stream debugTest to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/filereaderoutput)

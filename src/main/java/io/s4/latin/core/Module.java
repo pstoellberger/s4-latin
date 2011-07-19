@@ -3,11 +3,14 @@ package io.s4.latin.core;
 import io.s4.listener.EventProducer;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.VFS;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -54,14 +57,17 @@ public class Module implements ApplicationContextAware {
 					throw new RuntimeException("LatinFile resource cannot be null");
 
 
-				File latinFile = lfResource.getFile();
+				FileSystemManager fileSystemManager = VFS.getManager();
+				FileObject fileObject = fileSystemManager.resolveFile(location);
 
-				FileReader fi = new FileReader(latinFile);
-				BufferedReader br = new BufferedReader(fi);
+				Reader reader = new InputStreamReader(fileObject.getContent().getInputStream());
+				BufferedReader br = new BufferedReader(reader);
+				
 				String chunk ="",filecontent ="";
 				while ((chunk = br.readLine()) != null) {
 					filecontent += chunk + "\n";
 				}
+				
 				if (processPEs) {
 					System.out.println("Parse queries");
 					DefaultListableBeanFactory moduleBeans = S4LatinBeansFactory.createPEs(ctx, filecontent);

@@ -146,7 +146,7 @@ public class FilePersister implements Persister {
 
 			@SuppressWarnings("unchecked")
 			List<StreamRow> rows = (List<StreamRow>) value;
-			fw = new FileWriter(outputFilename,true);
+			fw = new FileWriter(outputFilename,!first);
 
 			for (StreamRow row : rows) {
 

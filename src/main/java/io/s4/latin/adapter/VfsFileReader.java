@@ -1,6 +1,7 @@
 package io.s4.latin.adapter;
 
 import io.s4.collector.EventWrapper;
+import io.s4.latin.pojo.PojoUtil;
 import io.s4.latin.pojo.StreamRow;
 import io.s4.latin.pojo.StreamRow.ValueType;
 import io.s4.listener.EventHandler;
@@ -8,20 +9,18 @@ import io.s4.listener.EventProducer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.commons.vfs.FileContent;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
-import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.RandomAccessContent;
 import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.util.RandomAccessMode;
@@ -46,9 +45,20 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 	private FileObject fileObject;
 	private boolean tailing = true;
 
-
+	private List<String> csvHeaders;
+	private boolean first = true;
+	
+	private enum InputType {
+		CSV,
+		JSON,
+		TEXT
+	}
+	private InputType inputType = InputType.TEXT;
+	
+	
 	private LinkedBlockingQueue<String> messageQueue = new LinkedBlockingQueue<String>();
 	private Set<io.s4.listener.EventHandler> handlers = new HashSet<io.s4.listener.EventHandler>();
+	private String delimiter = ";";
 
 	public VfsFileReader(Properties props) {
 		if (props != null) {
@@ -60,13 +70,24 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 			}
 			if (props.getProperty("stream") != null) {
 				streamName = props.getProperty("stream");
-				if (streamName.startsWith("debug")) {
+				if (streamName.trim().startsWith("debug")) {
 					debug = true;
 				}
 			}
 			if (props.getProperty("tail") != null) {
 				tailing = Boolean.parseBoolean(props.getProperty("tail"));
 			}
+			if (props.getProperty("debug") != null) {
+				debug = Boolean.parseBoolean(props.getProperty("debug"));
+			}
+
+			if (props.getProperty("type") != null) {
+				setInputType(props.getProperty("type"));
+			}
+			if (props.getProperty("delimiter") != null) {
+				delimiter = props.getProperty("delimiter");
+			}
+
 		}
 	}
 
@@ -103,7 +124,26 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 		return wait;
 	}
 
+	public void setInputType(String type){
+		try {
+			this.inputType = InputType.valueOf(type);
+		}
+		catch (Exception e) {
+			String values = "";
+			for (InputType t : InputType.values()) {
+				values += "[" + t + "]";
+			}
+			Logger.getLogger("s4").error("Unknown output type for FilePersister: " + type 
+					+ " Possible values are: " + values);
+		}
+	}
 
+	public void setDelimiter(String delimiter) {
+		this.inputType = InputType.CSV;
+		this.delimiter = delimiter;
+	}
+
+	
 	public void init() {
 		//	        for (int i = 0; i < 1; i++) {
 		Dequeuer dequeuer = new Dequeuer(1);
@@ -159,8 +199,14 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 				blankCount++;
 				continue;
 			}
-			messageCount++;
+			if (first && inputType.equals(InputType.CSV)) {
+				csvHeaders = PojoUtil.getCsvColumns(inputLine, delimiter);
+				first = false;
+				continue;
+			}
+			first = false;
 			messageQueue.add(inputLine);
+			messageCount++;
 		}
 	}
 	public void run() {
@@ -197,15 +243,27 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 							lastFilePointer = 0;
 							backOffTime = INITIAL_WAIT_TIME;
 						} else if (fileObject.getContent().getSize() > lastFileSize) {
+							FileContent fc = fileObject.getContent();
 							fileLarger = true;
-							RandomAccessContent rac = fileObject.getContent().getRandomAccessContent(RandomAccessMode.READ);
-							rac.seek(lastFilePointer);
-							reader = new InputStreamReader(rac.getInputStream());
-							BufferedReader bufferedReader = new BufferedReader(reader);
-							process(bufferedReader);
-							lastFilePointer = rac.getFilePointer();
-							lastFileSize = fileObject.getContent().getSize();
-							rac.close();
+							try {
+								RandomAccessContent rac = fc.getRandomAccessContent(RandomAccessMode.READ);
+								rac.seek(lastFilePointer);
+								reader = new InputStreamReader(rac.getInputStream());
+								BufferedReader bufferedReader = new BufferedReader(reader);
+								process(bufferedReader);
+								lastFilePointer = rac.getFilePointer();
+								lastFileSize = fileObject.getContent().getSize();
+								rac.close();
+							}
+							catch (FileSystemException e) {
+								// the file doesn't support random access, so let's just read it once
+								reader = new InputStreamReader(fc.getInputStream());
+								BufferedReader bufferedReader = new BufferedReader(reader);
+								process(bufferedReader);
+								lastFileSize = fileObject.getContent().getSize();
+								fc.close();
+							}
+							
 						}
 						try {
 							//release file so it can be externally deleted/renamed if necessary
@@ -272,14 +330,32 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 		public void run() {
 			while (!Thread.interrupted()) {
 				try {
-					String message = messageQueue.take();
-					StreamRow sr = new StreamRow();
-					sr.set("line", message, ValueType.STRING);
+					StreamRow row = null;
+					String line = messageQueue.take();
+					switch(inputType) {
+					case CSV:
+						List<String> values = PojoUtil.getCsvColumns(line, delimiter);
+						row = PojoUtil.combineStringValues(csvHeaders, values);
+						break;
+					case JSON:
+						row = PojoUtil.fromJson(line);
+						break;
+					// in case its text we just set a column called line of type string, which is also default
+					case TEXT:
+						row = new StreamRow();
+						row.set("line", line, ValueType.STRING);
+						break;
+					}
+					first = false;
 					if (isDebug()) {
-						System.out.println(sr);
+						System.out.println(row);
+					}
+					
+					if (row == null) {
+						return;
 					}
 
-					EventWrapper ew = new EventWrapper(streamName, sr, null);
+					EventWrapper ew = new EventWrapper(streamName, row, null);
 					for (io.s4.listener.EventHandler handler : handlers) {
 						try {
 							handler.processEvent(ew);

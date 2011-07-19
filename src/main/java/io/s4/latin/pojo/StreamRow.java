@@ -61,7 +61,7 @@ public class StreamRow {
 	public String toString() {
 		String output = this.getClass().getName() + "[ ";
 		for (String key : row.keySet()) {
-			output += "(" + key + " : " + row.get(key) + ")";
+			output += "(key=\"" + key + "\", value=\"" + row.get(key) + "\")";
 		}
 		output += " ]";
 		return output;

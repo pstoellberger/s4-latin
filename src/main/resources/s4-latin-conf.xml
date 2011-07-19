@@ -51,7 +51,7 @@
     <bean id="latinModule" class="io.s4.latin.core.Module" init-method="init">
     <property name="latinFile" >
     <list>
-        <value>classpath:query.s4latin</value>
+        <value>res:query.s4latin</value>
       </list>
     </property>
     <property name="processPEs" value="true"/>
