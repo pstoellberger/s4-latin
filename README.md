@@ -91,7 +91,6 @@ So if you want to switch to another sample, rename the according file: sample2.s
 
 
 <b> Sample 2 :Twitter-Feed Reader (sample2.s4latin) </b>
-<pre>
 
     // make sure you replace xxxx with your username and password
     create stream input as Source(io.s4.latin.adapter.TwitterFeedListener,user=xxxx;password=xxxx;url=http://stream.twitter.com:80/1/statuses/sample.json)
