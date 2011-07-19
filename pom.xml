@@ -68,8 +68,13 @@
 									file="${basedir}/target/${project.artifactId}-${project.version}.jar"
 									todir="target/dist/lib" />
 								<copy todir="target/dist/" overwrite="true">
+									<fileset dir="${basedir}/src/main/s4app/">
+										<include name="*" />
+									</fileset>
+								</copy>
+								<copy todir="target/dist/files" overwrite="true">
 									<fileset dir="${basedir}/src/main/resources/">
-										<include name="*.xml" />
+										<include name="*" />
 									</fileset>
 								</copy>
 								<zip destfile="target/${project.artifactId}-${project.version}.zip">

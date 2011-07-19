@@ -13,6 +13,7 @@ public class AccessLogParserPE extends AbstractPE {
     private String id;
     private EventDispatcher dispatcher;
     private String outputStreamName;
+    private String columnName = "test";
     
     private String logEntryPattern = "^([\\d.]+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(.+?)\" (\\d{3}) (\\d+) \"([^\"]+)\" \"([^\"]+)\"";
     private Pattern p = Pattern.compile(logEntryPattern);
@@ -33,6 +34,10 @@ public class AccessLogParserPE extends AbstractPE {
         this.outputStreamName = outputStreamName;
     }
 
+    public void setColumnName(String col) {
+    	this.columnName = col;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -41,11 +46,11 @@ public class AccessLogParserPE extends AbstractPE {
         if (line == null) {
             return;
         }
-        Matcher matcher = p.matcher(((String)line.get("line")));
+        Matcher matcher = p.matcher(((String)line.get(columnName)));
         if (!matcher.matches() || 
           9 != matcher.groupCount()) {
           System.err.println("Bad log entry (or problem with RE?):");
-          System.err.println(line.get("line"));
+          System.err.println(line.get(columnName));
           return;
         }
 

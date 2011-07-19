@@ -1,5 +1,0 @@
-//create stream debuginput as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in.csv;type=CSV;delimiter=\t;debug=true)
-create stream inputStream as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in;type=JSON)
-debugTest = select id,time,speaker from inputStream where "speaker" = 'franklin delano roosevelt' or "speaker" = 'richard m nixon'
-persist stream debugTest to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/filereaderoutput)
-//create stream input as Source(io.s4.latin.adapter.TwitterFeedListener,user=xxxx;password=zzzz;url=http://stream.twitter.com:80/1/statuses/sample.json)

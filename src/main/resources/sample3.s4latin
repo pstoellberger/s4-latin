@@ -1,0 +1,5 @@
+// use the accesslog parser PE in the s4-latin-conf.xml in combination with the s4latin process defined below
+
+create stream RawLog as Source(io.s4.latin.adapter.VfsFileReader,file=res:mini-access.log;type=TEXT)
+bigrows = select request,date,bytes from AccesslogRow where "bytes" > '20000' and "response" = '200'
+persist stream bigrows to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/bigrows;)

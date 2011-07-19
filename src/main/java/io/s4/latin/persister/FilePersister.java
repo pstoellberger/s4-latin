@@ -146,13 +146,14 @@ public class FilePersister implements Persister {
 
 			@SuppressWarnings("unchecked")
 			List<StreamRow> rows = (List<StreamRow>) value;
-			fw = new FileWriter(outputFilename,!first);
+			fw = new FileWriter(outputFilename,true);
 
 			for (StreamRow row : rows) {
 
 				if (outputType.equals(OutputType.JSON)) {
 					JSONObject output = PojoUtil.toJson(row);
 					fw.append(output.toString() + "\n");
+					first = false;
 
 				} else if (outputType.equals(OutputType.CSV)) {
 

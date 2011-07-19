@@ -3,6 +3,8 @@ package io.s4.latin.core;
 import io.s4.listener.EventProducer;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
@@ -56,12 +58,22 @@ public class Module implements ApplicationContextAware {
 				if (lfResource == null)
 					throw new RuntimeException("LatinFile resource cannot be null");
 
+				BufferedReader br;
+				try {
+					FileSystemManager fileSystemManager = VFS.getManager();
+					FileObject fileObject = fileSystemManager.resolveFile(location);
 
-				FileSystemManager fileSystemManager = VFS.getManager();
-				FileObject fileObject = fileSystemManager.resolveFile(location);
+					Reader reader = new InputStreamReader(fileObject.getContent().getInputStream());
+					br = new BufferedReader(reader);
 
-				Reader reader = new InputStreamReader(fileObject.getContent().getInputStream());
-				BufferedReader br = new BufferedReader(reader);
+				} catch (Exception e) {
+					// we tried using VFS, lets see if we can get it from the classloader
+
+					File latinFile = lfResource.getFile();
+					FileReader fi = new FileReader(latinFile);
+					br =  new BufferedReader(fi);
+				}
+				
 				
 				String chunk ="",filecontent ="";
 				while ((chunk = br.readLine()) != null) {

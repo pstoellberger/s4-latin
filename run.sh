@@ -5,10 +5,9 @@ if [ -d "$S4_IMAGE" ]; then
 	echo "---------------------------------------------------"
 	echo ""
 	rm -rf tmp*
-	mvn clean package
+	mvn clean package -o
 	rm -rf $S4_IMAGE/s4-apps/s4-latin
 	mkdir $S4_IMAGE/s4-apps/s4-latin/
-	cp -R src/main/resources/*.s4latin $S4_IMAGE/s4-apps/s4-latin/
 	cp -R target/dist/ $S4_IMAGE/s4-apps/s4-latin/
 	sh start_app.sh 
 else

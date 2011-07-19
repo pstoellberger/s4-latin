@@ -40,9 +40,9 @@ public class LatinPersisterPE extends AbstractPE {
 			
 			if (from != null) {
 				from = from.trim();
-				if (from.startsWith("debug")) {
-					this.debug = true;
-				}
+//				if (from.startsWith("debug")) {
+//					this.debug = true;
+//				}
 			}
 			else {
 				throw new RuntimeException("You have to define an Input Stream Name for this Persister\n Source: " + this);

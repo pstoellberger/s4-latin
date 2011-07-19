@@ -34,11 +34,16 @@ public class Select {
 	public String toString() {
 		String str = null;
 		if (fields != null ) {
-			str =" Select( ";
+			str =" Select(";
+			boolean has = false;
 			for (String field : fields) {
-				str += field + " ";
+				str += field + ", ";
+				has = true;
 			}
-			str += " )";
+			if (has) {
+				str = str.substring(0,str.length()-2);	
+			}
+			str += ")";
 		}
 		return str;
 	}

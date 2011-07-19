@@ -61,7 +61,7 @@ public class LatinParser {
 		for (String statement : statements) {
 			index++;
 			String id = getStreamName(statement) + "_" + index;
-			if (!statement.toLowerCase().contains("create stream") && !statement.startsWith("persist stream ")) {
+			if (statement != null && statement.trim().length() > 0 && !statement.toLowerCase().contains("create stream") && !statement.startsWith("persist stream ")) {
 
 				// Partitioner Bean definition
 				BeanDefinitionBuilder buildPartitioner = BeanDefinitionBuilder.rootBeanDefinition("io.s4.dispatcher.partitioner.DefaultPartitioner");
@@ -110,7 +110,7 @@ public class LatinParser {
 		if (latin != null) {
 			String output = "";
 			for (String line : latin.split("\n")) {
-				if (!line.startsWith("//")) {
+				if (!line.startsWith("//") && (line.trim().length() > 0)) {
 					output += line.replace("\n", " ").replaceAll("  ", " ").replaceAll("; ", ";") + "\n";
 				}
 			}
@@ -125,7 +125,7 @@ public class LatinParser {
 			int iSelect = statement.indexOf("select ");
 			int iFrom = statement.indexOf(" from ");
 			if (iSelect >= 0 && iFrom >= 0) {
-				return statement.substring(iSelect+7,iFrom).split(",");
+				return statement.substring(iSelect+7,iFrom).replaceAll(" ","").split(",");
 			}
 		}
 		return null;
@@ -256,7 +256,7 @@ public class LatinParser {
 			int end = statement.indexOf(")",start);
 			if (start >= 0 && end >= 0) {
 				String props = statement.substring(start+className.length()+1, end);
-				props = props.replaceAll(";", "\n");
+				props = props.replaceAll(";", "\n").replaceAll(" ", "");
 				return props;
 			}
 		}
