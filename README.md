@@ -113,8 +113,7 @@ persist stream bigrows to Output(io.s4.latin.persister.FilePersister,type=JSON;f
 </pre>
 
 In combination with PEs defined in the s4-latin-conf.xml
-<pre>
-    
+
     <bean id="accesslogParserPE" class="io.s4.examples.logstats.pe.AccessLogParserPE">
       <property name="id" value="accesslogPE"/>
       <property name="keys">
@@ -161,8 +160,7 @@ In combination with PEs defined in the s4-latin-conf.xml
     </property>
     <property name="processPEs" value="true"/>
     </bean>
-    
-</pre>
+
 
 
 Developing with Eclipse
