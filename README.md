@@ -80,40 +80,35 @@ So if you want to switch to another sample, rename the according file: sample2.s
 
 
 <b> Sample 1 : File extraction, selection and projection, persist to file (sample.s4latin) </b>
-<pre>
 
-// The VfsFileReader can process files of type CSV, JSON or TEXT (TEXT will result in 1 column called "line")
-create stream input as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in;type=JSON)
+    // The VfsFileReader can process files of type CSV, JSON or TEXT (TEXT will result in 1 column called "line")
+    create stream input as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in;type=JSON)
+    
+    filtered = select id,time,speaker from input where "speaker" = 'franklin delano roosevelt' or "speaker" = 'richard m nixon'
+    
+    persist stream filtered to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/speech.out.csv;delimiter=\t)
+    persist stream filtered to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/speech.out.json;)
 
-filtered = select id,time,speaker from input where "speaker" = 'franklin delano roosevelt' or "speaker" = 'richard m nixon'
-
-persist stream filtered to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/speech.out.csv;delimiter=\t)
-persist stream filtered to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/speech.out.json;)
-
-</pre>
 
 <b> Sample 2 :Twitter-Feed Reader (sample2.s4latin) </b>
 <pre>
 
+    // make sure you replace xxxx with your username and password
+    create stream input as Source(io.s4.latin.adapter.TwitterFeedListener,user=xxxx;password=xxxx;url=http://stream.twitter.com:80/1/statuses/sample.json)
+    
+    Twitter = select id,created_at,text from input where "truncated" = 'true'
+    persist stream Twitter to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/truncated_twitter_data;delimiter=\t\t)
 
-// make sure you replace xxxx with your username and password
-create stream input as Source(io.s4.latin.adapter.TwitterFeedListener,user=xxxx;password=xxxx;url=http://stream.twitter.com:80/1/statuses/sample.json)
 
-Twitter = select id,created_at,text from input where "truncated" = 'true'
-persist stream Twitter to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/truncated_twitter_data;delimiter=\t\t)
-</pre>
+<b> Sample 3 : Apache access.log parser (combination of manually configured PEs and s4latin (sample3.s4latin + sample3.s4-latin-conf.xml) </b>
 
-<b> Sample 3 : Apache access.log Parser (combination of manually configured PEs and s4latin (sample3.s4latin) </b>
-<pre>
-// use the accesslog parser PE in the s4-latin-conf.xml in combination with the s4latin process defined below
+    // use the accesslog parser PE in the s4-latin-conf.xml in combination with the s4latin process defined below
+    create stream RawLog as Source(io.s4.latin.adapter.VfsFileReader,file=res:mini-access.log;type=TEXT)
+    bigrows = select request,date,bytes from AccesslogRow where "bytes" > '20000' and "response" = '200'
+    persist stream bigrows to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/bigrows;)
 
-create stream RawLog as Source(io.s4.latin.adapter.VfsFileReader,file=res:mini-access.log;type=TEXT)
-bigrows = select request,date,bytes from AccesslogRow where "bytes" > '20000' and "response" = '200'
-persist stream bigrows to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/bigrows;)
-</pre>
 
 In combination with PEs defined in the s4-latin-conf.xml
-<pre>
     
     <bean id="accesslogParserPE" class="io.s4.examples.logstats.pe.AccessLogParserPE">
       <property name="id" value="accesslogPE"/>
@@ -162,7 +157,6 @@ In combination with PEs defined in the s4-latin-conf.xml
     <property name="processPEs" value="true"/>
     </bean>
     
-</pre>
 
 
 Developing with Eclipse
@@ -172,4 +166,12 @@ The project contains already all metadata files to import it as Eclipse project.
 You can always refresh this by using the maven eclipse plugin:
 
 mvn eclipse:clean eclipse:eclipse
+
+
+Contact
+-----------------------
+
+Author::     Paul Stoellberger
+Email::      pstoellberger@gmail.com
+
 
