@@ -1,6 +1,6 @@
 S4 Latin
 ==============================
-A Streaming Language for the Distributed Stream Computing Platform S4
+A Streaming Language for the Distributed Stream Computing Platform S4<br />
 For more information, see [s4.io](http://s4.io)
 
 Requirements
@@ -165,13 +165,11 @@ Developing with Eclipse
 The project contains already all metadata files to import it as Eclipse project.
 You can always refresh this by using the maven eclipse plugin:
 
-mvn eclipse:clean eclipse:eclipse
-
+    mvn eclipse:clean eclipse:eclipse
 
 Contact
 -----------------------
-
-Author::     Paul Stoellberger
-Email::      pstoellberger@gmail.com
+Author:     Paul Stoellberger
+Email:      pstoellberger@gmail.com
 
 
