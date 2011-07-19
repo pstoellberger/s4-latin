@@ -38,9 +38,6 @@ Running the Sample
 #  Download the project files from the repository.
 git clone git://github.com/pstoellberger/s4-latin.git
 
-# Create image
-./gradlew allImage
-
 # set the S4_IMAGE environmental variable
 export S4_IMAGE=<path to s4 image>
 e.g:
@@ -61,6 +58,29 @@ or
 cat /tmp/speech.out.json
 
 </pre>
+
+Samples
+---------------------------------------
+Sample 1 : File extraction, selection and projection, persist to file
+<pre>
+
+// INPUT
+// The VfsFileReader can process files of type CSV, JSON or TEXT (TEXT will result in 1 column called "line")
+create stream input as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in;type=JSON)
+
+// SELECTION / PROJECTION
+// select only specific speakers
+
+debugprojection = select id,time,speaker from input where "speaker" = 'franklin delano roosevelt' or "speaker" = 'richard m nixon'
+
+// OUTPUT
+// Persist the stream
+persist stream debugprojection to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/speech.out.csv;delimiter=\t)
+persist stream debugprojection to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/speech.out.json;)
+
+
+</pre>
+
 
 Developing with Eclipse
 -----------------------
