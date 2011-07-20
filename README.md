@@ -32,7 +32,7 @@ Build Instructions
 
 
 
-Running the Sample
+Running the Examples
 ---------------------------------------
 <pre>
 #  Download the project files from the repository.
@@ -46,7 +46,7 @@ export S4_IMAGE=/opt/s4/s4image
 # build the package
 mvn clean package
 
-# deploy the sample application into the S4 image (relies in the S4_IMAGE environmental variable)
+# deploy the example application into the S4 image (relies in the S4_IMAGE environmental variable)
 cp -fpr target/dist/ $S4_IMAGE/s4-apps/myapp/
 
 # Start server with s4-latin app and afterwards the client adapter as well
@@ -67,19 +67,19 @@ Introduction
 All examples are included in the directory files/ in the applications directory.
 Please note that most files are referenced using res: to avoid path issues.
 If you change the s4latin files in the directory "files" it won't have any effect, since the VfsFileReader will read the versions in the packaged JAR file.
-Those samples are just for demonstration purposes. You need to use absolute paths if you want to use your own examples!
+Those examples are just for demonstration purposes. You need to use absolute paths if you want to use your own examples!
 
-In order to enable the example you want (sample 1 is default) you need to edit the "adapter-conf.xml" file in the application's directory
-and change the following line accordingly (sample.s4latin => sample2.s4latin or sample3.s4latin):
+In order to enable the example you want (example 1 is default) you need to edit the "adapter-conf.xml" file in the application's directory
+and change the following line accordingly (example.s4latin => example2.s4latin or example3.s4latin):
 
-        <value>res:sample.s4latin</value>
+        <value>res:example.s4latin</value>
 
 You have to do the same for the cluster components.
-For each sample there is a separate file. The one that will be used by default is always called "s4-latin-conf.xml".
-So if you want to switch to another example, rename the according file: sample2.s4-latin-conf.xml => s4-latin-conf.xml
+For each example there is a separate file. The one that will be used by default is always called "s4-latin-conf.xml".
+So if you want to switch to another example, rename the according file: example2.s4-latin-conf.xml => s4-latin-conf.xml
 
 
-<b> Example 1 : File extraction, selection and projection, persist to file (sample.s4latin) </b>
+<b> Example 1 : File extraction, selection and projection, persist to file (example.s4latin) </b>
 
     // The VfsFileReader can process files of type CSV, JSON or TEXT (TEXT will result in 1 column called "line")
     create stream input as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in;type=JSON)
@@ -90,7 +90,7 @@ So if you want to switch to another example, rename the according file: sample2.
     persist stream filtered to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/speech.out.json;)
 
 
-<b> Example 2 :Twitter-Feed Reader (sample2.s4latin) </b>
+<b> Example 2 :Twitter-Feed Reader (example2.s4latin) </b>
 
     // make sure you replace xxxx with your username and password
     create stream input as Source(io.s4.latin.adapter.TwitterFeedListener,user=xxxx;password=xxxx;url=http://stream.twitter.com:80/1/statuses/sample.json)
@@ -99,7 +99,7 @@ So if you want to switch to another example, rename the according file: sample2.
     persist stream Twitter to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/truncated_twitter_data;delimiter=\t\t)
 
 
-<b> Sample 3 : Apache access.log parser (combination of manually configured PEs and s4latin (sample3.s4latin + sample3.s4-latin-conf.xml) </b>
+<b> Example 3 : Apache access.log parser (combination of manually configured PEs and s4latin (example3.s4latin + example3.s4-latin-conf.xml) </b>
 
     // use the accesslog parser PE in the s4-latin-conf.xml in combination with the s4latin process defined below
     create stream RawLog as Source(io.s4.latin.adapter.VfsFileReader,file=res:mini-access.log;type=TEXT)
@@ -150,7 +150,7 @@ In combination with PEs defined in the s4-latin-conf.xml
     <bean id="latinModule" class="io.s4.latin.core.Module" init-method="init">
     <property name="latinFile" >
     <list>
-        <value>res:sample3.s4latin</value>
+        <value>res:example3.s4latin</value>
       </list>
     </property>
     <property name="processPEs" value="true"/>
