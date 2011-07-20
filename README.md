@@ -59,27 +59,27 @@ cat /tmp/speech.out.json
 
 </pre>
 
-Samples
+Examples
 ---------------------------------------
 
 Introduction
 ---------------------------------------
-All samples are included in the directory files/ in the applications directory.
+All examples are included in the directory files/ in the applications directory.
 Please note that most files are referenced using res: to avoid path issues.
 If you change the s4latin files in the directory "files" it won't have any effect, since the VfsFileReader will read the versions in the packaged JAR file.
 Those samples are just for demonstration purposes. You need to use absolute paths if you want to use your own examples!
 
-In order to enable the sample you want (sample 1 is default) you need to edit the "adapter-conf.xml" file in the application's directory
+In order to enable the example you want (sample 1 is default) you need to edit the "adapter-conf.xml" file in the application's directory
 and change the following line accordingly (sample.s4latin => sample2.s4latin or sample3.s4latin):
 
         <value>res:sample.s4latin</value>
 
 You have to do the same for the cluster components.
 For each sample there is a separate file. The one that will be used by default is always called "s4-latin-conf.xml".
-So if you want to switch to another sample, rename the according file: sample2.s4-latin-conf.xml => s4-latin-conf.xml
+So if you want to switch to another example, rename the according file: sample2.s4-latin-conf.xml => s4-latin-conf.xml
 
 
-<b> Sample 1 : File extraction, selection and projection, persist to file (sample.s4latin) </b>
+<b> Example 1 : File extraction, selection and projection, persist to file (sample.s4latin) </b>
 
     // The VfsFileReader can process files of type CSV, JSON or TEXT (TEXT will result in 1 column called "line")
     create stream input as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in;type=JSON)
@@ -90,7 +90,7 @@ So if you want to switch to another sample, rename the according file: sample2.s
     persist stream filtered to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/speech.out.json;)
 
 
-<b> Sample 2 :Twitter-Feed Reader (sample2.s4latin) </b>
+<b> Example 2 :Twitter-Feed Reader (sample2.s4latin) </b>
 
     // make sure you replace xxxx with your username and password
     create stream input as Source(io.s4.latin.adapter.TwitterFeedListener,user=xxxx;password=xxxx;url=http://stream.twitter.com:80/1/statuses/sample.json)
