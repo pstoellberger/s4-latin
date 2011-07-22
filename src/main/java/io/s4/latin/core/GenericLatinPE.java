@@ -11,7 +11,7 @@ import io.s4.processor.EventAdvice;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenericLatinPE extends AbstractPE {
+public class GenericLatinPE extends AbstractLatinPE {
 
 	private String id;
 	private EventDispatcher dispatcher;

@@ -1,5 +1,6 @@
 package io.s4.latin.persister;
 
+import io.s4.latin.core.AbstractLatinPE;
 import io.s4.latin.core.ObjectUtil;
 import io.s4.latin.parser.LatinParser;
 import io.s4.latin.pojo.StreamRow;
@@ -13,7 +14,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 
-public class LatinPersisterPE extends AbstractPE {
+public class LatinPersisterPE extends AbstractLatinPE {
 
 	private String id;
 	private String statement;
