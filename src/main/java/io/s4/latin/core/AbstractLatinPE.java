@@ -41,7 +41,6 @@ public abstract class AbstractLatinPE extends AbstractPE {
 	private FrequencyType outputFrequencyType = FrequencyType.EVENTCOUNT;
 	private int outputFrequencyOffset = 0;
 	private int eventCount = 0;
-	private int ttl = -1;
 	private Persister lookupTable;
 	private List<EventAdvice> eventAdviceList = new ArrayList<EventAdvice>();
 	private List<Object> keyValue;
@@ -408,16 +407,6 @@ public abstract class AbstractLatinPE extends AbstractPE {
 		return clone;
 	}
 
-	public void setTtl(int ttl) {
-		this.ttl = ttl;
-	}
-
-	/**
-	 * 
-	 */
-	public int getTtl() {
-		return ttl;
-	}
 
 	public List<EventAdvice> advise() {
 		return eventAdviceList;

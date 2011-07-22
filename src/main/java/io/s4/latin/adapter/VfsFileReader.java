@@ -1,6 +1,7 @@
 package io.s4.latin.adapter;
 
 import io.s4.collector.EventWrapper;
+import io.s4.dispatcher.partitioner.CompoundKeyInfo;
 import io.s4.latin.pojo.PojoUtil;
 import io.s4.latin.pojo.StreamRow;
 import io.s4.latin.pojo.StreamRow.ValueType;
@@ -354,7 +355,6 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 					if (row == null) {
 						return;
 					}
-
 					EventWrapper ew = new EventWrapper(streamName, row, null);
 					for (io.s4.listener.EventHandler handler : handlers) {
 						try {

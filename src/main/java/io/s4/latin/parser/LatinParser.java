@@ -33,6 +33,7 @@ public class LatinParser {
 		}
 		return bf;
 	}
+
 	public DefaultListableBeanFactory processStreamdefinitions(String streamLatin, DefaultListableBeanFactory bf) {
 		streamLatin = preProcess(streamLatin);
 		String[] statements = streamLatin.split("\n");
@@ -62,17 +63,70 @@ public class LatinParser {
 			index++;
 			String id = getStreamName(statement) + "_" + index;
 			if (statement != null && statement.trim().length() > 0 && !statement.toLowerCase().contains("create stream") && !statement.startsWith("persist stream ")) {
-
 				// Partitioner Bean definition
-				BeanDefinitionBuilder buildPartitioner = BeanDefinitionBuilder.rootBeanDefinition("io.s4.dispatcher.partitioner.DefaultPartitioner");
-				buildPartitioner.setScope(BeanDefinition.SCOPE_SINGLETON);
-				String[] streamNames = { getStreamName(statement) };
-				String[] keys = { "key" };
-				buildPartitioner.addPropertyValue("streamNames", streamNames );
-				buildPartitioner.addPropertyValue("hashKey", keys );
-				buildPartitioner.addPropertyReference("hasher", "hasher");
-				buildPartitioner.addPropertyValue("debug", false);
-				bf.registerBeanDefinition("partitioner"+ getStreamName(statement) + index, buildPartitioner.getBeanDefinition());
+//				if (statement.contains("join on ")) {
+//					BeanDefinitionBuilder buildPartitioner = BeanDefinitionBuilder.rootBeanDefinition("io.s4.latin.core.LatinPartitioner");
+//					buildPartitioner.setScope(BeanDefinition.SCOPE_SINGLETON);
+//					String[] streamNames = LatinParser.getJoinKeys(statement);
+//					String[] keys = LatinParser.getJoinKeys(statement);
+//					if (keys != null) {
+//						for (int i=0; i < keys.length; i++) {
+//							
+//							String[] key= keys[i].split(" ");
+//							
+//							keys[i] = key[1];
+//							streamNames[i] = key[0];
+//							System.err.println("Set Keys: " + keys[i] + " stream name: " + streamNames[i]);
+//						}
+//					}
+//
+//					buildPartitioner.addPropertyValue("hashKey", keys );
+//					buildPartitioner.addPropertyValue("streamNames", streamNames );
+//					buildPartitioner.addPropertyReference("hasher", "hasher");
+//					buildPartitioner.addPropertyValue("debug", true);
+//					bf.registerBeanDefinition("partitioner"+ getStreamName(statement) + index, buildPartitioner.getBeanDefinition());
+					
+//					BeanDefinitionBuilder buildPartitioner = BeanDefinitionBuilder.rootBeanDefinition("io.s4.dispatcher.partitioner.DefaultPartitioner");
+//					buildPartitioner.setScope(BeanDefinition.SCOPE_SINGLETON);
+//					String[] streamNames = LatinParser.getJoinKeys(statement);
+//					String[] keys = LatinParser.getJoinKeys(statement);
+//					if (keys != null) {
+//						for (int i=0; i < keys.length; i++) {
+//							
+//							String[] key= keys[i].split(" ");
+//							
+//							keys[i] = key[1];
+//							streamNames[i] = key[0];
+//							System.err.println("stream name: " + streamNames[i]);
+//						}
+//					}
+//
+//					String[] dummykeys = { "key" };
+//					buildPartitioner.addPropertyValue("hashKey", dummykeys );
+//					buildPartitioner.addPropertyValue("streamNames", streamNames );
+//					buildPartitioner.addPropertyReference("hasher", "hasher");
+//					buildPartitioner.addPropertyValue("debug", true);
+//					bf.registerBeanDefinition("partitioner"+ getStreamName(statement) + index, buildPartitioner.getBeanDefinition());
+//
+//					
+//					
+//				} else {
+					BeanDefinitionBuilder buildPartitioner = BeanDefinitionBuilder.rootBeanDefinition("io.s4.dispatcher.partitioner.DefaultPartitioner");
+					buildPartitioner.setScope(BeanDefinition.SCOPE_SINGLETON);
+					String[] streamNames = { getStreamName(statement) };
+
+					String[] keys = { "key" };
+					buildPartitioner.addPropertyValue("hashKey", keys );
+					buildPartitioner.addPropertyValue("streamNames", streamNames );
+					buildPartitioner.addPropertyReference("hasher", "hasher");
+					buildPartitioner.addPropertyValue("debug", false);
+					bf.registerBeanDefinition("partitioner"+ getStreamName(statement) + index, buildPartitioner.getBeanDefinition());
+
+
+
+//				}
+				
+				
 
 				// Dispatcher Bean definition
 				BeanDefinitionBuilder beanBuildr2 = BeanDefinitionBuilder.rootBeanDefinition("io.s4.dispatcher.Dispatcher");
@@ -89,17 +143,31 @@ public class LatinParser {
 
 				// Processing Bean definition
 
-				BeanDefinitionBuilder beanBuildr = BeanDefinitionBuilder.rootBeanDefinition("io.s4.latin.core.GenericLatinPE");
-				beanBuildr.setScope(BeanDefinition.SCOPE_SINGLETON);
-				beanBuildr.addPropertyValue("outputStreamName", getStreamName(statement));
-				beanBuildr.addPropertyValue("id", id);
-				beanBuildr.addPropertyValue("statement", statement);
-				beanBuildr.addPropertyReference("dispatcher", "dispatcher"+ getStreamName(statement) + index);
-				if (getStreamName(statement).startsWith("debug")) {
-					beanBuildr.addPropertyValue("debug", true);
-				}
+				if (statement.contains("join on ")) {
+					BeanDefinitionBuilder beanBuildr = BeanDefinitionBuilder.rootBeanDefinition("io.s4.latin.core.LatinJoinPE");
+					beanBuildr.setScope(BeanDefinition.SCOPE_SINGLETON);
+					beanBuildr.addPropertyValue("id", id);
+					beanBuildr.addPropertyValue("statement", statement);
+					beanBuildr.addPropertyReference("dispatcher", "dispatcher"+ getStreamName(statement) + index);
+					if (getStreamName(statement).startsWith("debug")) {
+						beanBuildr.addPropertyValue("debug", true);
+					}
+					bf.registerBeanDefinition(id, beanBuildr.getBeanDefinition());
 
-				bf.registerBeanDefinition(id, beanBuildr.getBeanDefinition());
+				}
+				else {
+					BeanDefinitionBuilder beanBuildr = BeanDefinitionBuilder.rootBeanDefinition("io.s4.latin.core.GenericLatinPE");
+					beanBuildr.setScope(BeanDefinition.SCOPE_SINGLETON);
+					beanBuildr.addPropertyValue("outputStreamName", getStreamName(statement));
+					beanBuildr.addPropertyValue("id", id);
+					beanBuildr.addPropertyValue("statement", statement);
+					beanBuildr.addPropertyReference("dispatcher", "dispatcher"+ getStreamName(statement) + index);
+					if (getStreamName(statement).startsWith("debug")) {
+						beanBuildr.addPropertyValue("debug", true);
+					}
+					bf.registerBeanDefinition(id, beanBuildr.getBeanDefinition());
+
+				}
 
 			}
 		}
@@ -250,6 +318,49 @@ public class LatinParser {
 		throw new RuntimeException("Cannot parse statement for output frequency: " + statement);
 	}
 
+	public static String[] getJoinKeys(String statement) {
+		if (statement != null) {
+			int iSelect = statement.toLowerCase().indexOf("join on ");
+			int iFrom = statement.toLowerCase().indexOf(" include ");
+			if (iSelect >= 0 && iFrom >= 0) {
+				String[] keys = statement.substring(iSelect+"join on".length(),iFrom).replaceAll(" ","").split(",");
+				for (int i=0; i < keys.length; i++) {
+					keys[i] = keys[i].replace(".", " ");
+				}
+				return keys;
+				
+			}
+		}
+		return null;
+	}
+	
+	public static String[] getJoinIncludes(String statement) {
+		if (statement != null) {
+			int includestart = statement.toLowerCase().indexOf(" include ");
+			int iwithin = statement.toLowerCase().indexOf(" within ");
+			if (includestart >= 0) {
+				int end = iwithin > 0 ? iwithin : statement.length();
+				String keys[] = statement.substring(includestart+" include ".length(),end).replaceAll(" ","").split(",");
+				for (int i=0; i < keys.length; i++) {
+					keys[i] = keys[i].replace(".", " ");
+				}
+				return keys;
+			}
+		}
+		return null;
+	}
+	
+	public static String getWithin(String statement) {
+		if (statement != null) {
+			statement = statement.toLowerCase();
+			int iWhere = statement.indexOf(" within ");
+			if (iWhere >= 0) {
+				return statement.substring(iWhere+" within ".length(),statement.length());
+			}
+		}
+		return null;
+	}
+	
 	public static String getProperties(String className, String statement) {
 		if (statement != null) {
 			int start = statement.indexOf(className);

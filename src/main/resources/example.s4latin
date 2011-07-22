@@ -2,13 +2,8 @@
 // INPUT
 // The VfsFileReader can process files of type CSV, JSON or TEXT (TEXT will result in 1 column called "line")
 // create stream debuginput as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in.csv;type=CSV;delimiter=\t;debug=true)
-create stream input as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in;type=JSON)
+create stream speech as Source(io.s4.latin.adapter.VfsFileReader,file=/tmp/speech.in;type=JSON)
+create stream sentences as Source(io.s4.latin.adapter.VfsFileReader,file=/tmp/sentence.in;type=JSON)
+joined = join on speech.id,sentences.speechId include speech.*,sentences.* 
+persist stream joined to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/joinedspeech;delimiter=\t)
 
-// SELECTION / PROJECTION
-// select only specific speakers
-debugprojection = select id,time,speaker from input where "speaker" = 'franklin delano roosevelt' or "speaker" = 'richard m nixon'
-
-// OUTPUT
-// Persist the stream
-persist stream debugprojection to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/speech.out.csv;delimiter=\t)
-persist stream debugprojection to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/speech.out.json;)
