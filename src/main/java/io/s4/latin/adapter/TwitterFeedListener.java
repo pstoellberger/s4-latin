@@ -287,8 +287,8 @@ public class TwitterFeedListener implements ISource, EventProducer, Runnable {
     
     public static void main(String[] args) {
     	Properties props = new Properties();
-    	props.setProperty("user", "pstoellberger");
-    	props.setProperty("password", "twitter!p8");
+    	props.setProperty("user", "");
+    	props.setProperty("password", "");
     	props.setProperty("url", "http://stream.twitter.com/1/statuses/sample.json");
     	props.setProperty("stream", "TestStream");
     	
