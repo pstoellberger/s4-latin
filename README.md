@@ -79,15 +79,20 @@ For each example there is a separate file. The one that will be used by default 
 So if you want to switch to another example, rename the according file: example2.s4-latin-conf.xml => s4-latin-conf.xml
 
 
-<b> Example 1 : File extraction, selection and projection, persist to file (example.s4latin) </b>
+<b> Example 1 : File extraction, selection and projection, join with other stream and persist to file (example.s4latin) </b>
 
+    
+    // INPUT
     // The VfsFileReader can process files of type CSV, JSON or TEXT (TEXT will result in 1 column called "line")
-    create stream input as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in;type=JSON)
-    
-    filtered = select id,time,speaker from input where "speaker" = 'franklin delano roosevelt' or "speaker" = 'richard m nixon'
-    
-    persist stream filtered to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/speech.out.csv;delimiter=\t)
-    persist stream filtered to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/speech.out.json;)
+    // create stream debuginput as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in.csv;type=CSV;delimiter=\t;debug=true)
+
+    create stream allspeeches as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in;type=JSON)
+    create stream sentences as Source(io.s4.latin.adapter.VfsFileReader,file=res:sentence.in;type=JSON)
+    speech = select * from allspeeches where "speaker" = 'franklin delano roosevelt' or "speaker" = 'richard m nixon'
+    joined = join(io.s4.latin.core.LatinJoinPE) on speech.id,sentences.speechId include speech.id,speech.location,speech.speaker,sentences.text window 100 seconds every 15 seconds
+    persist stream joined to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/joinedspeech;delimiter=\t)
+
+
 
 
 <b> Example 2 :Twitter-Feed Reader (example2.s4latin) </b>

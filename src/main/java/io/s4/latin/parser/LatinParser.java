@@ -5,6 +5,8 @@ import io.s4.processor.AbstractPE.FrequencyType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -63,54 +65,7 @@ public class LatinParser {
 			index++;
 			String id = getStreamName(statement) + "_" + index;
 			if (statement != null && statement.trim().length() > 0 && !statement.toLowerCase().contains("create stream") && !statement.startsWith("persist stream ")) {
-				// Partitioner Bean definition
-//				if (statement.contains("join on ")) {
-//					BeanDefinitionBuilder buildPartitioner = BeanDefinitionBuilder.rootBeanDefinition("io.s4.latin.core.LatinPartitioner");
-//					buildPartitioner.setScope(BeanDefinition.SCOPE_SINGLETON);
-//					String[] streamNames = LatinParser.getJoinKeys(statement);
-//					String[] keys = LatinParser.getJoinKeys(statement);
-//					if (keys != null) {
-//						for (int i=0; i < keys.length; i++) {
-//							
-//							String[] key= keys[i].split(" ");
-//							
-//							keys[i] = key[1];
-//							streamNames[i] = key[0];
-//							System.err.println("Set Keys: " + keys[i] + " stream name: " + streamNames[i]);
-//						}
-//					}
-//
-//					buildPartitioner.addPropertyValue("hashKey", keys );
-//					buildPartitioner.addPropertyValue("streamNames", streamNames );
-//					buildPartitioner.addPropertyReference("hasher", "hasher");
-//					buildPartitioner.addPropertyValue("debug", true);
-//					bf.registerBeanDefinition("partitioner"+ getStreamName(statement) + index, buildPartitioner.getBeanDefinition());
-					
-//					BeanDefinitionBuilder buildPartitioner = BeanDefinitionBuilder.rootBeanDefinition("io.s4.dispatcher.partitioner.DefaultPartitioner");
-//					buildPartitioner.setScope(BeanDefinition.SCOPE_SINGLETON);
-//					String[] streamNames = LatinParser.getJoinKeys(statement);
-//					String[] keys = LatinParser.getJoinKeys(statement);
-//					if (keys != null) {
-//						for (int i=0; i < keys.length; i++) {
-//							
-//							String[] key= keys[i].split(" ");
-//							
-//							keys[i] = key[1];
-//							streamNames[i] = key[0];
-//							System.err.println("stream name: " + streamNames[i]);
-//						}
-//					}
-//
-//					String[] dummykeys = { "key" };
-//					buildPartitioner.addPropertyValue("hashKey", dummykeys );
-//					buildPartitioner.addPropertyValue("streamNames", streamNames );
-//					buildPartitioner.addPropertyReference("hasher", "hasher");
-//					buildPartitioner.addPropertyValue("debug", true);
-//					bf.registerBeanDefinition("partitioner"+ getStreamName(statement) + index, buildPartitioner.getBeanDefinition());
-//
-//					
-//					
-//				} else {
+
 					BeanDefinitionBuilder buildPartitioner = BeanDefinitionBuilder.rootBeanDefinition("io.s4.dispatcher.partitioner.DefaultPartitioner");
 					buildPartitioner.setScope(BeanDefinition.SCOPE_SINGLETON);
 					String[] streamNames = { getStreamName(statement) };
@@ -123,8 +78,6 @@ public class LatinParser {
 					bf.registerBeanDefinition("partitioner"+ getStreamName(statement) + index, buildPartitioner.getBeanDefinition());
 
 
-
-//				}
 				
 				
 
@@ -143,8 +96,9 @@ public class LatinParser {
 
 				// Processing Bean definition
 
-				if (statement.contains("join on ")) {
-					BeanDefinitionBuilder beanBuildr = BeanDefinitionBuilder.rootBeanDefinition("io.s4.latin.core.LatinJoinPE");
+				if (statement.contains("join(")) {
+					String className = getJoinClass(statement);
+					BeanDefinitionBuilder beanBuildr = BeanDefinitionBuilder.rootBeanDefinition(className);
 					beanBuildr.setScope(BeanDefinition.SCOPE_SINGLETON);
 					beanBuildr.addPropertyValue("id", id);
 					beanBuildr.addPropertyValue("statement", statement);
@@ -320,10 +274,11 @@ public class LatinParser {
 
 	public static String[] getJoinKeys(String statement) {
 		if (statement != null) {
-			int iSelect = statement.toLowerCase().indexOf("join on ");
+			int iSelect = statement.toLowerCase().indexOf("join( ");
+			int endclass = statement.indexOf(") on",iSelect);
 			int iFrom = statement.toLowerCase().indexOf(" include ");
-			if (iSelect >= 0 && iFrom >= 0) {
-				String[] keys = statement.substring(iSelect+"join on".length(),iFrom).replaceAll(" ","").split(",");
+			if (endclass >= 0 && iFrom >= 0) {
+				String[] keys = statement.substring(endclass+") on".length(),iFrom).replaceAll(" ","").split(",");
 				for (int i=0; i < keys.length; i++) {
 					keys[i] = keys[i].replace(".", " ");
 				}
@@ -337,9 +292,9 @@ public class LatinParser {
 	public static String[] getJoinIncludes(String statement) {
 		if (statement != null) {
 			int includestart = statement.toLowerCase().indexOf(" include ");
-			int iwithin = statement.toLowerCase().indexOf(" within ");
+			int iwindow = statement.toLowerCase().indexOf(" window ");
 			if (includestart >= 0) {
-				int end = iwithin > 0 ? iwithin : statement.length();
+				int end = iwindow > 0 ? iwindow : statement.length();
 				String keys[] = statement.substring(includestart+" include ".length(),end).replaceAll(" ","").split(",");
 				for (int i=0; i < keys.length; i++) {
 					keys[i] = keys[i].replace(".", " ");
@@ -350,15 +305,27 @@ public class LatinParser {
 		return null;
 	}
 	
-	public static String getWithin(String statement) {
+	public static String getWindow(String statement) {
 		if (statement != null) {
 			statement = statement.toLowerCase();
-			int iWhere = statement.indexOf(" within ");
+			int iWhere = statement.indexOf(" window ");
 			if (iWhere >= 0) {
-				return statement.substring(iWhere+" within ".length(),statement.length());
+				return statement.substring(iWhere+" window ".length(),statement.length());
 			}
 		}
 		return null;
+	}
+	
+	public static String getJoinClass(String statement) {
+		String stmt = statement.toLowerCase();
+		int start = statement.indexOf(" join(");
+		int end = statement.indexOf(")",start);
+
+		if (start >= 0 && end >= 0) {
+			String className  = statement.substring(start+" join(".length(), end);
+			return className;
+		}
+	    return null;
 	}
 	
 	public static String getProperties(String className, String statement) {
@@ -375,5 +342,7 @@ public class LatinParser {
 	}
 
 
-
+public static void main(String[] args) {
+	System.out.println(getJoinClass("joined = join(io.s4.latin.core.LatinJoinPE) on speech.id,sentences.speechId include speech.*,sentences.*"));
+}
 }

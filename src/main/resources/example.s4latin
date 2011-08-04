@@ -2,8 +2,10 @@
 // INPUT
 // The VfsFileReader can process files of type CSV, JSON or TEXT (TEXT will result in 1 column called "line")
 // create stream debuginput as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in.csv;type=CSV;delimiter=\t;debug=true)
-create stream speech as Source(io.s4.latin.adapter.VfsFileReader,file=/tmp/speech.in;type=JSON)
-create stream sentences as Source(io.s4.latin.adapter.VfsFileReader,file=/tmp/sentence.in;type=JSON)
-joined = join on speech.id,sentences.speechId include speech.*,sentences.* 
+
+create stream allspeeches as Source(io.s4.latin.adapter.VfsFileReader,file=res:speech.in;type=JSON)
+create stream sentences as Source(io.s4.latin.adapter.VfsFileReader,file=res:sentence.in;type=JSON)
+speech = select * from allspeeches where "speaker" = 'franklin delano roosevelt' or "speaker" = 'richard m nixon'
+joined = join(io.s4.latin.core.LatinJoinPE) on speech.id,sentences.speechId include speech.id,speech.location,speech.speaker,sentences.text window 100 seconds every 15 seconds
 persist stream joined to Output(io.s4.latin.persister.FilePersister,type=CSV;file=/tmp/joinedspeech;delimiter=\t)
 

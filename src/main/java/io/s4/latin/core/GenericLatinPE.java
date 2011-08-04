@@ -47,7 +47,8 @@ public class GenericLatinPE extends AbstractLatinPE {
 		if (isDebug()) {
 			System.out.println(row);
 		}
-
+		
+		
 
 		dispatcher.dispatchEvent(outputStreamName, row);
 	}

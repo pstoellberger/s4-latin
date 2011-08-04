@@ -1,35 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry including="**/*.java" kind="src" output="target/test-classes" path="src/test/java"/>
-	<classpathentry kind="src" path="src/main/s4app"/>
-	<classpathentry excluding="**/*.java" kind="src" output="target/test-classes" path="src/test/resources"/>
-	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
-	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
-	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/asm/asm/3.2/asm-3.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/bcel/bcel/5.2/bcel-5.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.3/commons-codec-1.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-jexl/commons-jexl/1.1/commons-jexl-1.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-vfs/commons-vfs/1.0/commons-vfs-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/net/sf/flexjson/flexjson/2.1/flexjson-2.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/1.6/gson-1.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/jakarta-regexp/jakarta-regexp/1.4/jakarta-regexp-1.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/jline/jline/0.9.94/jline-0.9.94.jar"/>
-	<classpathentry kind="lib" path="/Users/pstoellberger/Development/msc/s4/lib/kryo-1.01.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/json/json/20090211/json-20090211.jar"/>
-	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/esotericsoftware/kryo/1.01/kryo-1.01.jar"/>
-	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.15/log4j-1.2.15.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/esotericsoftware/minlog/1.2/minlog-1.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/esotericsoftware/reflectasm/0.8/reflectasm-0.8.jar"/>
-	<classpathentry kind="var" path="M2_REPO/io/s4/s4-comm/0.3-SNAPSHOT/s4-comm-0.3-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/io/s4/s4-core/0.3-SNAPSHOT/s4-core-0.3-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/springframework/spring/2.5.6/spring-2.5.6.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/zookeeper/zookeeper/3.3.1/zookeeper-3.3.1.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="src" path="src/test/java" output="target/test-classes" including="**/*.java"/>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/asm/asm/3.2/asm-3.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/bcel/bcel/5.2/bcel-5.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.3/commons-codec-1.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-jexl/commons-jexl/1.1/commons-jexl-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-vfs/commons-vfs/1.0/commons-vfs-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/net/sf/flexjson/flexjson/2.1/flexjson-2.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/1.6/gson-1.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/jakarta-regexp/jakarta-regexp/1.4/jakarta-regexp-1.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/jline/jline/0.9.94/jline-0.9.94.jar"/>
+  <classpathentry kind="lib" path="/Users/pstoellberger/dev/s4/lib/kryo-1.01.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/json/json/20090211/json-20090211.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/googlecode/kryo/1.04/kryo-1.04.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.15/log4j-1.2.15.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/googlecode/minlog/1.2/minlog-1.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/googlecode/reflectasm/1.01/reflectasm-1.01.jar"/>
+  <classpathentry kind="var" path="M2_REPO/io/s4/s4-comm/0.3-SNAPSHOT/s4-comm-0.3-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/io/s4/s4-core/0.3-SNAPSHOT/s4-core-0.3-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring/2.5.6/spring-2.5.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/zookeeper/zookeeper/3.3.1/zookeeper-3.3.1.jar"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 </classpath>

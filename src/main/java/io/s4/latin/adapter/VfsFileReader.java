@@ -35,7 +35,7 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 
 	private static long INITIAL_WAIT_TIME = 1000;
 	private String file;
-	private long maxBackoffTime = 30 * 1000;
+	private long maxBackoffTime = 10 * 1000;
 	private long backOffTime = INITIAL_WAIT_TIME;
 	private long messageCount = 0;
 	private long blankCount = 0;
