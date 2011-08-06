@@ -114,7 +114,7 @@ So if you want to switch to another example, rename the according file: example2
 
 In combination with PEs defined in the s4-latin-conf.xml
     
-    <bean id="accesslogParserPE" class="io.s4.examples.logstats.pe.AccessLogParserPE">
+    <bean id="accesslogParserPE" class="io.s4.latin.core.AccessLogParserPE">
       <property name="id" value="accesslogPE"/>
       <property name="keys">
         <list>
