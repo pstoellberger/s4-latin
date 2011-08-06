@@ -54,6 +54,7 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 		JSON,
 		TEXT
 	}
+	private String textColName = "line";
 	private InputType inputType = InputType.TEXT;
 	
 	
@@ -65,6 +66,9 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 		if (props != null) {
 			if (props.getProperty("file") != null) {
 				file = props.getProperty("file");
+			}
+			if (props.getProperty("columnName") != null) {
+				textColName = props.getProperty("columnName");
 			}
 			if (props.getProperty("maxBackoffTime") != null) {
 				maxBackoffTime = Long.parseLong(props.getProperty("maxBackoffTime"));
@@ -153,45 +157,6 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 		//	        }
 		(new Thread(this)).start();
 	}
-
-//	public void runa() {
-//		long backoffTime = 1000;
-//		while(!Thread.interrupted()) {
-//			try {
-//				openAndRead();
-//			} catch (Exception e) {
-//				Logger.getLogger("s4").error("Exception reading logfile", e);
-//				try {
-//					Thread.sleep(backoffTime);
-//					System.out.println("Sleeping for :" + backoffTime/1000 + " seconds");
-//				} catch (InterruptedException ie) {
-//					Thread.currentThread().interrupt();
-//				}
-//
-//			}
-//		}
-//	}
-
-//	public void openAndRead() throws Exception {
-//		URL url = new URL(file);
-//		System.out.println("## Reading File: " + file);
-//		URLConnection connection = url.openConnection();
-//		InputStream is = connection.getInputStream();
-//		InputStreamReader isr = new InputStreamReader(is);
-//		BufferedReader br = new BufferedReader(isr);
-//
-//		String inputLine = null;
-//		while ((inputLine = br.readLine()) != null) {
-//			if (inputLine.trim().length() == 0) {
-//				blankCount++;
-//				continue;
-//			}
-//			messageCount++;
-//			messageQueue.add(inputLine);
-//		}
-//		System.out.println(messageCount + " lines read ");
-//		throw new Exception("nothing to read anymore");
-//	}
 
 	private void process(BufferedReader br) throws IOException {
 		String inputLine = null;
@@ -324,6 +289,7 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 	class Dequeuer implements Runnable {
 		private int id;
 
+
 		public Dequeuer(int id) {
 			this.id = id;
 		}
@@ -344,7 +310,7 @@ public class VfsFileReader implements ISource, EventProducer, Runnable {
 					// in case its text we just set a column called line of type string, which is also default
 					case TEXT:
 						row = new StreamRow();
-						row.set("line", line, ValueType.STRING);
+						row.set(textColName , line, ValueType.STRING);
 						break;
 					}
 					first = false;

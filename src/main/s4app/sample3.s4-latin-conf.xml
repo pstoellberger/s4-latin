@@ -3,7 +3,7 @@
 
      
      
-  <bean id="accesslogParserPE" class="io.s4.examples.logstats.pe.AccessLogParserPE">
+  <bean id="accesslogParserPE" class="io.s4.latin.core.AccessLogParserPE">
     <property name="id" value="accesslogPE"/>
     <property name="keys">
       <list>

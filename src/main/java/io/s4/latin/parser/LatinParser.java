@@ -3,10 +3,11 @@ package io.s4.latin.parser;
 import io.s4.dispatcher.partitioner.Partitioner;
 import io.s4.processor.AbstractPE.FrequencyType;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Properties;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -109,6 +110,35 @@ public class LatinParser {
 					bf.registerBeanDefinition(id, beanBuildr.getBeanDefinition());
 
 				}
+				else if  (statement.contains("process stream")) {
+					String className = LatinParser.getUdfClassName(statement);
+					String propString = LatinParser.getProperties(className, statement);
+					Properties props = new Properties();
+					if (propString != null) {
+						StringReader sr = new StringReader(propString);
+						try {
+							props.load(sr);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
+
+					BeanDefinitionBuilder beanBuildr = BeanDefinitionBuilder.rootBeanDefinition(className);
+					beanBuildr.setScope(BeanDefinition.SCOPE_SINGLETON);
+					beanBuildr.addConstructorArgValue(props);
+					beanBuildr.addPropertyValue("outputStreamName", LatinParser.getStreamName(statement));
+					beanBuildr.addPropertyValue("id", id);
+					beanBuildr.addPropertyReference("dispatcher", "dispatcher"+ getStreamName(statement) + index);
+					List<String> streamkeys = new ArrayList<String>();
+					streamkeys.add(LatinParser.getProcessStream(statement) + " *");
+					System.out.println("Settin key:" + LatinParser.getProcessStream(statement) + " *");
+					beanBuildr.addPropertyValue("keys", streamkeys.toArray(new String[1]));
+
+					
+					bf.registerBeanDefinition(id, beanBuildr.getBeanDefinition());
+				}
 				else {
 					BeanDefinitionBuilder beanBuildr = BeanDefinitionBuilder.rootBeanDefinition("io.s4.latin.core.GenericLatinPE");
 					beanBuildr.setScope(BeanDefinition.SCOPE_SINGLETON);
@@ -179,6 +209,18 @@ public class LatinParser {
 		return null;
 	}
 
+	public static String getProcessStream(String statement) {
+		if (statement != null) {
+			String statement2 = statement.toLowerCase();
+			int iPersist = statement2.indexOf("process stream");
+			int iTo = statement2.indexOf(" with ", iPersist);
+			if (iPersist >= 0) {
+				int end = iTo > 0 ? iTo : statement.length();
+				return statement.substring(iPersist+"process stream ".length(),end);
+			}
+		}
+		return null;
+	}
 	public static String getWhere(String statement) {
 		if (statement != null) {
 			statement = statement.toLowerCase();
@@ -219,6 +261,18 @@ public class LatinParser {
 		}
 		throw new RuntimeException("Cannot parse statement for source class name: " + statement);
 	}
+	
+	public static String getUdfClassName(String statement) {
+		if (statement != null) {
+			int start = statement.toLowerCase().indexOf("udf(");
+			int end = statement.indexOf(",",start);
+			if (start >= 0 && end >= 0) {
+				return statement.substring(start+"UDF(".length(), end);
+			}
+		}
+		throw new RuntimeException("Cannot parse statement for source class name: " + statement);
+	}
+
 
 	public static String getOutputClassName(String statement) {
 		if (statement != null) {
