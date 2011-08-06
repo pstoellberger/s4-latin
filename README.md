@@ -162,6 +162,13 @@ In combination with PEs defined in the s4-latin-conf.xml
     </bean>
     
 
+<b> Example 4 : Apache access.log parser in pur s4latin. use UDF to parse </b>
+
+    create stream RawLog as Source(io.s4.latin.adapter.VfsFileReader,file=res:mini-access.log;type=TEXT;columnName=line)
+    arows = process stream RawLog with UDF(io.s4.latin.core.AccessLogParserPE,columnName=line;debug=true)
+    bigrows = select request,date,bytes from arows where "bytes" > '20000' and "response" = '200'
+    persist stream bigrows to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/bigrows;)
+
 
 Developing with Eclipse
 -----------------------
