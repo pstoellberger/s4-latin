@@ -169,6 +169,18 @@ In combination with PEs defined in the s4-latin-conf.xml
     bigrows = select request,date,bytes from arows where "bytes" > '20000' and "response" = '200'
     persist stream bigrows to Output(io.s4.latin.persister.FilePersister,type=JSON;file=/tmp/bigrows;)
 
+<b> Example 5 : Stream Twitter feed and use Kettle UDF to generate top10 every minute </b>
+
+    // adopted from the kettle streaming example : real-time streaming data aggregation with Kettle http://www.ibridge.be/?p=204
+    create stream input as Source(io.s4.latin.adapter.TwitterFeedListener,user=xxxxxxx;password=xxxxx;url=http://stream.twitter.com:80/1/statuses/sample.json)
+    tweets = select text,id,created_at,retweet_count,hashtag0,hashtag1,hashtag2,hashtag3,hashtag4 from input where "hashtag0" != ''
+    tophashtags = process stream tweets with UDF(io.s4.latin.core.KettlePE,transformation=res:Read a twitter stream.ktr;input=injector;output=outputstep;loginterval=10)
+    selectfields = select nr,hashtag,count,from,to from tophashtags
+    persist stream selectfields to Output(io.s4.latin.persister.FilePersister,type=CSV;delimiter=\t;file=/tmp/toptags;)
+ 
+
+
+
 
 Developing with Eclipse
 -----------------------
