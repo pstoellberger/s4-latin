@@ -9,6 +9,7 @@
 	<properties>
 		<maven.compiler.source>1.5</maven.compiler.source>
 		<maven.compiler.target>1.5</maven.compiler.target>
+		<pentaho.kettle.version>TRUNK-SNAPSHOT</pentaho.kettle.version>
 	</properties>
 	<build>
 		<plugins>
@@ -45,7 +46,34 @@
 									<type>jar</type>
 									<outputDirectory>target/dist/lib</outputDirectory>
 								</artifactItem>
+								<artifactItem>
+									<groupId>pentaho.kettle</groupId>
+									<artifactId>kettle-core</artifactId>
+									<version>${pentaho.kettle.version}</version>
+									<outputDirectory>target/dist/lib</outputDirectory>
 
+								</artifactItem>
+								<artifactItem>
+									<groupId>pentaho.kettle</groupId>
+									<artifactId>kettle-db</artifactId>
+									<version>${pentaho.kettle.version}</version>
+									<outputDirectory>target/dist/lib</outputDirectory>
+
+								</artifactItem>
+								<artifactItem>
+									<groupId>pentaho.kettle</groupId>
+									<artifactId>kettle-engine</artifactId>
+									<version>${pentaho.kettle.version}</version>
+									<outputDirectory>target/dist/lib</outputDirectory>
+
+								</artifactItem>
+								<artifactItem>
+									<groupId>rhino</groupId>
+									<artifactId>js</artifactId>
+									<version>1.7R2</version>
+									<outputDirectory>target/dist/lib</outputDirectory>
+
+								</artifactItem>
 							</artifactItems>
 						</configuration>
 					</execution>
@@ -107,13 +135,21 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-		<!-- <repository> <id>central-sync</id> <name>Central Sync Sources</name> 
-			<url>https://oss.sonatype.org/content/repositories/central-sync</url> </repository> -->
 		<repository>
 			<id>apache</id>
 			<name>apache</name>
 			<url>http://ftp.cica.es/mirrors/maven2/</url>
 		</repository>
+		<repository>
+			<id>pentaho-repo</id>
+			<name>pentaho repository</name>
+			<url>http://repository.pentaho.org/artifactory/pentaho</url>
+		</repository>
+		<repository>
+			<id>pentaho-third-party</id>
+			<url>http://repo.pentaho.org/artifactory/third-party/</url>
+		</repository>
+
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -154,7 +190,27 @@
 			<artifactId>commons-vfs</artifactId>
 			<version>1.0</version>
 		</dependency>
-
+		<!-- KETTLE DEPENDENCIES -->
+		<dependency>
+			<groupId>pentaho.kettle</groupId>
+			<artifactId>kettle-core</artifactId>
+			<version>${pentaho.kettle.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>pentaho.kettle</groupId>
+			<artifactId>kettle-db</artifactId>
+			<version>${pentaho.kettle.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>pentaho.kettle</groupId>
+			<artifactId>kettle-engine</artifactId>
+			<version>${pentaho.kettle.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>rhino</groupId>
+			<artifactId>js</artifactId>
+			<version>1.7R2</version>
+		</dependency>
 
 	</dependencies>
 </project>

@@ -388,7 +388,7 @@ public class LatinParser {
 			int end = statement.indexOf(")",start);
 			if (start >= 0 && end >= 0) {
 				String props = statement.substring(start+className.length()+1, end);
-				props = props.replaceAll(";", "\n").replaceAll(" ", "");
+				props = props.replaceAll(";", "\n");
 				return props;
 			}
 		}
