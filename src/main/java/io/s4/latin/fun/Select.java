@@ -1,6 +1,7 @@
 package io.s4.latin.fun;
 
 import io.s4.latin.pojo.StreamRow;
+import io.s4.latin.pojo.StreamRow.ValueType;
 
 public class Select {
 
@@ -23,7 +24,13 @@ public class Select {
 		if (!(fields != null && fields.length == 1 && fields[0].equals("*"))) {
 			StreamRow rowNew = new StreamRow();
 			for (String key : fields) {
-				rowNew.set(key, row.get(key), row.getValueMeta(key));
+				if (key.startsWith("'") && key.endsWith("'")) {
+					String literal = key.substring(1,key.length()-1);
+					rowNew.set(literal, literal, ValueType.STRING);
+				}
+				else {
+					rowNew.set(key, row.get(key), row.getValueMeta(key));
+				}
 			}
 			return rowNew;
 		}
